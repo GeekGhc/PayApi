@@ -68,4 +68,78 @@ class PayController extends BaseController
             }
         }
     }
+
+
+    //支付宝签名
+    public function rsaSign(Request $request)
+    {
+        $privateKey = Config::get('constants.PRIVATE_KEY');
+        $param = $request->getContent();
+        $sign = $this->alonersaSign(urldecode($param), $privateKey);
+        $newStr = $param . '&sign=' . urlencode($sign);
+        return $newStr;
+    }
+    /**
+     * RSA单独签名方法，未做字符串处理,字符串处理见getSignContent()
+     * @param $data 待签名字符串
+     * @param $privatekey 商户私钥，根据keyfromfile来判断是读取字符串还是读取文件，false:填写私钥字符串去回车和空格 true:填写私钥文件路径
+     * @param $signType 签名方式，RSA:SHA1     RSA2:SHA256
+     * @param $keyfromfile 私钥获取方式，读取字符串还是读文件
+     * @return string
+     * @author mengyu.wh
+     */
+    public function alonersaSign($data, $privatekey, $signType = "RSA2", $keyfromfile = false)
+    {
+
+        if (!$keyfromfile) {
+            $priKey = $privatekey;
+            $res = "-----BEGIN RSA PRIVATE KEY-----\n" .
+                wordwrap($priKey, 64, "\n", true) .
+                "\n-----END RSA PRIVATE KEY-----";
+        } else {
+            $priKey = file_get_contents($privatekey);
+            $res = openssl_get_privatekey($priKey);
+        }
+
+        ($res) or die('您使用的私钥格式错误，请检查RSA私钥配置');
+
+        if ("RSA2" == $signType) {
+            openssl_sign($data, $sign, $res, OPENSSL_ALGO_SHA256);
+        } else {
+            openssl_sign($data, $sign, $res);
+        }
+
+        if ($keyfromfile) {
+            openssl_free_key($res);
+        }
+        $sign = base64_encode($sign);
+        return $sign;
+    }
+    //充值信息  根据实际项目订单内容
+    public function rechargeAmount()
+    {
+
+    }
+    //支付宝支付回调接口
+    public function alipayCallback(Request $request)
+    {
+        $array = array();
+        $dataArray = array();
+        $data = $request->getContent();
+        if (!$data) {
+            return response('failure');
+        }
+        $data = urldecode($data);
+        $array = explode('&', $data);
+        foreach ($array as $key => $val) {
+            $k = explode('=', $val);
+            $dataArray[$k[0]] = array_key_exists(1, $k) ? $k[1] : '';
+        }
+        if ($dataArray['trade_status'] != 'TRADE_SUCCESS') {
+            return response('failure');
+        } else {
+            unset($dataArray['sign_type']);
+            //项目实际逻辑代码
+        }
+    }
 }
