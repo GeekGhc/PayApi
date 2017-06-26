@@ -11,3 +11,4 @@
 ## 相关文档
 
 - App 微信支付[开发文档](https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=8_1)
+- 微信 [签名校验工具](https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=20_1)
