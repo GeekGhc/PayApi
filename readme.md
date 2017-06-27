@@ -10,5 +10,7 @@
 
 ## 相关文档
 
+> 我的博客文章 [APP微信支付宝支付服务端接口](http://jellybook.me/articles/2017/06/app-wechat-alipay-api)
+
 - App 微信支付[开发文档](https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=8_1)
 - 微信 [签名校验工具](https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=20_1)
